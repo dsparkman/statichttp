@@ -1,7 +1,6 @@
 // This package is a adapted from the "net/http" package
 // by the The Go Authors. It has been adapted specifically
-// for serving a static website with custom 404.html and
-// no directory browsing.
+// for serving a static website with no directory browsing
 
 // Original License:
 
@@ -13,6 +12,7 @@ package statichttp
 
 import (
 	"net/http"
+	"os"
 	"path"
 	"strings"
 )
@@ -96,17 +96,29 @@ func serveFile(w http.ResponseWriter, r *http.Request, fs http.FileSystem, name 
 
 	// Still a directory? (we didn't find an index.html file)
 	if d.IsDir() {
-
-		// We are raising a file does not exit error
-		err := errors.New("file does not exist")
-		if err != nil {
-			msg, code := toHTTPError(err)
-			http.Error(w, msg, code)
-			return
-		}
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
 	}
 
 	// serveContent will check modification time
-	sizeFunc := func() (int64, error) { return d.Size(), nil }
-	http.ServeContent(w, r, d.Name(), d.ModTime(), sizeFunc, f)
+	http.ServeContent(w, r, d.Name(), d.ModTime(), f)
+}
+
+func localRedirect(w http.ResponseWriter, r *http.Request, newPath string) {
+	if q := r.URL.RawQuery; q != "" {
+		newPath += "?" + q
+	}
+	w.Header().Set("Location", newPath)
+	w.WriteHeader(http.StatusMovedPermanently)
+}
+
+func toHTTPError(err error) (msg string, httpStatus int) {
+	if os.IsNotExist(err) {
+		return http.StatusText(http.StatusNotFound), http.StatusNotFound
+	}
+	if os.IsPermission(err) {
+		return http.StatusText(http.StatusForbidden), http.StatusForbidden
+	}
+	// Default:
+	return http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError
 }
