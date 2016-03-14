@@ -1,0 +1,9 @@
+This package is a adapted from the "net/http" package
+by the The Go Authors. It has been adapted specifically
+for serving a static website with no directory browsing
+
+Original License:
+
+Copyright 2009 The Go Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
