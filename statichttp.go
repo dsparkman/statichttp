@@ -23,6 +23,7 @@ type fileHandler struct {
 
 // FileServer has been adapted from "net/http"
 func FileServer(root http.FileSystem) http.Handler {
+    //Quick change
 	return &fileHandler{root}
 }
 
