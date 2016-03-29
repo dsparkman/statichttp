@@ -117,7 +117,7 @@ func toHTTPError(err error) (msg string, httpStatus int) {
 		return http.StatusText(http.StatusNotFound), http.StatusNotFound
 	}
 	if os.IsPermission(err) {
-		return http.StatusText(http.StatusForbidden), http.StatusForbidden
+        return http.StatusText(http.StatusForbidden), http.StatusForbidden
 	}
 	// Default:
 	return http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError
